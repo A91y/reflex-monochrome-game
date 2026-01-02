@@ -1,6 +1,6 @@
-'use client';
+"use client";
 
-import { useState, useEffect, useCallback, useRef } from 'react';
+import { useState, useEffect, useCallback, useRef } from "react";
 
 interface Target {
   id: number;
@@ -11,8 +11,8 @@ interface Target {
   angle: number;
 }
 
-type GameState = 'menu' | 'playing' | 'gameOver';
-type Difficulty = 'easy' | 'normal' | 'hard';
+type GameState = "menu" | "playing" | "gameOver";
+type Difficulty = "easy" | "normal" | "hard";
 
 interface DifficultyConfig {
   spawnInterval: number;
@@ -47,35 +47,37 @@ const DIFFICULTY_CONFIGS: Record<Difficulty, DifficultyConfig> = {
 };
 
 export default function MonochromeGame() {
-  const [gameState, setGameState] = useState<GameState>('menu');
-  const [difficulty, setDifficulty] = useState<Difficulty>('normal');
+  const [gameState, setGameState] = useState<GameState>("menu");
+  const [difficulty, setDifficulty] = useState<Difficulty>("normal");
   const [score, setScore] = useState(0);
   const [highScore, setHighScore] = useState(0);
   const [targets, setTargets] = useState<Target[]>([]);
   const [timeLeft, setTimeLeft] = useState(30);
   const [combo, setCombo] = useState(0);
-  const [particles, setParticles] = useState<Array<{ id: number; x: number; y: number }>>([]);
+  const [particles, setParticles] = useState<
+    Array<{ id: number; x: number; y: number }>
+  >([]);
   const gameAreaRef = useRef<HTMLDivElement>(null);
   const targetIdRef = useRef(0);
   const particleIdRef = useRef(0);
   const comboTimeoutRef = useRef<NodeJS.Timeout | null>(null);
-  
+
   const config = DIFFICULTY_CONFIGS[difficulty];
 
   // Load high score from localStorage
   useEffect(() => {
-    const saved = localStorage.getItem('monochrome-highscore');
+    const saved = localStorage.getItem("monochrome-highscore");
     if (saved) setHighScore(parseInt(saved));
   }, []);
 
   // Game timer
   useEffect(() => {
-    if (gameState !== 'playing') return;
+    if (gameState !== "playing") return;
 
     const timer = setInterval(() => {
       setTimeLeft((prev) => {
         if (prev <= 1) {
-          setGameState('gameOver');
+          setGameState("gameOver");
           return 0;
         }
         return prev - 1;
@@ -87,7 +89,7 @@ export default function MonochromeGame() {
 
   // Spawn targets
   useEffect(() => {
-    if (gameState !== 'playing') return;
+    if (gameState !== "playing") return;
 
     const spawnInterval = setInterval(() => {
       const newTarget: Target = {
@@ -95,7 +97,9 @@ export default function MonochromeGame() {
         x: Math.random() * 80 + 10,
         y: Math.random() * 80 + 10,
         size: Math.random() * 30 + 40,
-        speed: Math.random() * (config.targetSpeedMax - config.targetSpeedMin) + config.targetSpeedMin,
+        speed:
+          Math.random() * (config.targetSpeedMax - config.targetSpeedMin) +
+          config.targetSpeedMin,
         angle: Math.random() * Math.PI * 2,
       };
 
@@ -112,7 +116,7 @@ export default function MonochromeGame() {
 
   // Animate targets
   useEffect(() => {
-    if (gameState !== 'playing') return;
+    if (gameState !== "playing") return;
 
     const animationInterval = setInterval(() => {
       setTargets((prev) =>
@@ -129,7 +133,7 @@ export default function MonochromeGame() {
   }, [gameState]);
 
   const startGame = useCallback(() => {
-    setGameState('playing');
+    setGameState("playing");
     setScore(0);
     setTargets([]);
     setTimeLeft(30);
@@ -139,7 +143,7 @@ export default function MonochromeGame() {
   const handleTargetClick = useCallback(
     (targetId: number, e: React.MouseEvent<HTMLDivElement>) => {
       e.stopPropagation();
-      
+
       // Remove target
       setTargets((prev) => prev.filter((t) => t.id !== targetId));
 
@@ -163,8 +167,10 @@ export default function MonochromeGame() {
       const rect = e.currentTarget.getBoundingClientRect();
       const gameRect = gameAreaRef.current?.getBoundingClientRect();
       if (gameRect) {
-        const x = ((rect.left + rect.width / 2 - gameRect.left) / gameRect.width) * 100;
-        const y = ((rect.top + rect.height / 2 - gameRect.top) / gameRect.height) * 100;
+        const x =
+          ((rect.left + rect.width / 2 - gameRect.left) / gameRect.width) * 100;
+        const y =
+          ((rect.top + rect.height / 2 - gameRect.top) / gameRect.height) * 100;
 
         for (let i = 0; i < 8; i++) {
           const particleId = particleIdRef.current++;
@@ -179,9 +185,9 @@ export default function MonochromeGame() {
   );
 
   useEffect(() => {
-    if (gameState === 'gameOver' && score > highScore) {
+    if (gameState === "gameOver" && score > highScore) {
       setHighScore(score);
-      localStorage.setItem('monochrome-highscore', score.toString());
+      localStorage.setItem("monochrome-highscore", score.toString());
     }
   }, [gameState, score, highScore]);
 
@@ -203,7 +209,7 @@ export default function MonochromeGame() {
 
       {/* Main Content */}
       <div className="relative z-10 flex min-h-screen items-center justify-center p-4 sm:p-6 md:p-8">
-        {gameState === 'menu' && (
+        {gameState === "menu" && (
           <div className="text-center space-y-6 sm:space-y-8 animate-[fadeIn_0.5s_ease-out]">
             {/* Title */}
             <div className="relative">
@@ -245,30 +251,38 @@ export default function MonochromeGame() {
 
             {/* Difficulty Selector */}
             <div className="space-y-3">
-              <div className="text-white/40 text-xs tracking-widest uppercase">Difficulty</div>
+              <div className="text-white/40 text-xs tracking-widest uppercase">
+                Difficulty
+              </div>
               <div className="flex flex-col sm:flex-row gap-2 justify-center px-4 sm:px-0">
-                {(['easy', 'normal', 'hard'] as Difficulty[]).map((diff) => (
+                {(["easy", "normal", "hard"] as Difficulty[]).map((diff) => (
                   <button
                     key={diff}
                     onClick={() => setDifficulty(diff)}
                     className={`px-6 sm:px-8 py-2 border-2 text-xs sm:text-sm tracking-wider uppercase transition-all ${
                       difficulty === diff
-                        ? 'border-white text-black bg-white font-bold'
-                        : 'border-white/30 text-white/60 hover:border-white/60 hover:text-white'
+                        ? "border-white text-black bg-white font-bold"
+                        : "border-white/30 text-white/60 hover:border-white/60 hover:text-white"
                     }`}
                   >
                     {diff}
                   </button>
                 ))}
               </div>
-              {difficulty === 'easy' && (
-                <p className="text-white/40 text-xs">Slower targets • Longer lifetime • More time to combo</p>
+              {difficulty === "easy" && (
+                <p className="text-white/40 text-xs">
+                  Slower targets • Longer lifetime • More time to combo
+                </p>
               )}
-              {difficulty === 'normal' && (
-                <p className="text-white/40 text-xs">Balanced challenge • Standard speed</p>
+              {difficulty === "normal" && (
+                <p className="text-white/40 text-xs">
+                  Balanced challenge • Standard speed
+                </p>
               )}
-              {difficulty === 'hard' && (
-                <p className="text-white/40 text-xs">Fast targets • Quick spawns • Test your reflexes!</p>
+              {difficulty === "hard" && (
+                <p className="text-white/40 text-xs">
+                  Fast targets • Quick spawns • Test your reflexes!
+                </p>
               )}
             </div>
 
@@ -284,7 +298,9 @@ export default function MonochromeGame() {
               onClick={startGame}
               className="relative px-8 sm:px-12 py-3 sm:py-4 border-2 border-white text-white text-xs sm:text-sm tracking-[0.2em] sm:tracking-[0.3em] uppercase overflow-hidden group transition-all hover:scale-105 hover:shadow-[0_0_40px_rgba(255,255,255,0.3)]"
             >
-              <span className="relative z-10 group-hover:opacity-0 transition-opacity duration-500">Start Game</span>
+              <span className="relative z-10 group-hover:opacity-0 transition-opacity duration-500">
+                Start Game
+              </span>
               <div className="absolute inset-0 bg-white transform -translate-x-full group-hover:translate-x-0 transition-transform duration-500" />
               <span className="absolute inset-0 flex items-center justify-center text-black opacity-0 group-hover:opacity-100 tracking-[0.2em] sm:tracking-[0.3em] transition-opacity duration-500 z-20">
                 START GAME
@@ -293,25 +309,37 @@ export default function MonochromeGame() {
           </div>
         )}
 
-        {gameState === 'playing' && (
+        {gameState === "playing" && (
           <div className="w-full max-w-5xl">
             {/* HUD */}
             <div className="flex justify-between items-center mb-4 sm:mb-6 md:mb-8 text-white">
               <div className="space-y-0.5 sm:space-y-1">
-                <div className="text-2xl sm:text-3xl md:text-4xl font-thin tracking-wider">{score}</div>
-                <div className="text-[10px] sm:text-xs tracking-widest text-white/40">SCORE</div>
+                <div className="text-2xl sm:text-3xl md:text-4xl font-thin tracking-wider">
+                  {score}
+                </div>
+                <div className="text-[10px] sm:text-xs tracking-widest text-white/40">
+                  SCORE
+                </div>
               </div>
 
               <div className="text-center space-y-0.5 sm:space-y-1">
-                <div className="text-4xl sm:text-5xl md:text-6xl font-thin">{timeLeft}</div>
-                <div className="text-[10px] sm:text-xs tracking-widest text-white/40">SECONDS</div>
+                <div className="text-4xl sm:text-5xl md:text-6xl font-thin">
+                  {timeLeft}
+                </div>
+                <div className="text-[10px] sm:text-xs tracking-widest text-white/40">
+                  SECONDS
+                </div>
               </div>
 
               <div className="space-y-0.5 sm:space-y-1 text-right">
                 <div className="text-2xl sm:text-3xl md:text-4xl font-thin tracking-wider">
-                  {combo > 0 ? `x${Math.min(Math.floor(combo / 3) + 1, 5)}` : '—'}
+                  {combo > 0
+                    ? `x${Math.min(Math.floor(combo / 3) + 1, 5)}`
+                    : "—"}
                 </div>
-                <div className="text-[10px] sm:text-xs tracking-widest text-white/40">COMBO</div>
+                <div className="text-[10px] sm:text-xs tracking-widest text-white/40">
+                  COMBO
+                </div>
               </div>
             </div>
 
@@ -331,7 +359,7 @@ export default function MonochromeGame() {
                     top: `${target.y}%`,
                     width: `${target.size}px`,
                     height: `${target.size}px`,
-                    transform: 'translate(-50%, -50%)',
+                    transform: "translate(-50%, -50%)",
                   }}
                 >
                   <div className="relative w-full h-full">
@@ -375,7 +403,7 @@ export default function MonochromeGame() {
           </div>
         )}
 
-        {gameState === 'gameOver' && (
+        {gameState === "gameOver" && (
           <div className="text-center space-y-6 sm:space-y-8 animate-[fadeIn_0.5s_ease-out] px-4">
             <h2 className="text-4xl sm:text-5xl md:text-6xl font-thin tracking-wider text-white mb-4 sm:mb-8">
               GAME OVER
@@ -384,8 +412,12 @@ export default function MonochromeGame() {
             {/* Score Display */}
             <div className="space-y-4 sm:space-y-6">
               <div>
-                <div className="text-5xl sm:text-6xl md:text-7xl font-thin text-white mb-2">{score}</div>
-                <div className="text-xs sm:text-sm tracking-[0.3em] sm:tracking-[0.5em] text-white/40">FINAL SCORE</div>
+                <div className="text-5xl sm:text-6xl md:text-7xl font-thin text-white mb-2">
+                  {score}
+                </div>
+                <div className="text-xs sm:text-sm tracking-[0.3em] sm:tracking-[0.5em] text-white/40">
+                  FINAL SCORE
+                </div>
               </div>
 
               {score === highScore && score > 0 && (
@@ -404,11 +436,15 @@ export default function MonochromeGame() {
             {/* Stats */}
             <div className="flex gap-8 sm:gap-12 justify-center text-white/60 text-xs sm:text-sm">
               <div>
-                <div className="text-xl sm:text-2xl md:text-3xl font-thin text-white">{Math.round(score / 30)}</div>
+                <div className="text-xl sm:text-2xl md:text-3xl font-thin text-white">
+                  {Math.round(score / 30)}
+                </div>
                 <div className="tracking-widest mt-1">AVG/SEC</div>
               </div>
               <div>
-                <div className="text-xl sm:text-2xl md:text-3xl font-thin text-white">{Math.floor(score / 10)}</div>
+                <div className="text-xl sm:text-2xl md:text-3xl font-thin text-white">
+                  {Math.floor(score / 10)}
+                </div>
                 <div className="tracking-widest mt-1">HITS</div>
               </div>
             </div>
@@ -422,7 +458,7 @@ export default function MonochromeGame() {
                 Play Again
               </button>
               <button
-                onClick={() => setGameState('menu')}
+                onClick={() => setGameState("menu")}
                 className="px-8 sm:px-10 py-3 border-2 border-white/40 text-white/40 text-xs sm:text-sm tracking-[0.2em] sm:tracking-[0.3em] uppercase hover:border-white hover:text-white transition-all"
               >
                 Menu
@@ -480,7 +516,10 @@ export default function MonochromeGame() {
           }
           100% {
             opacity: 0;
-            transform: translate(calc(-50% + var(--tx, 50px)), calc(-50% + var(--ty, -50px)))
+            transform: translate(
+                calc(-50% + var(--tx, 50px)),
+                calc(-50% + var(--ty, -50px))
+              )
               scale(0);
           }
         }
